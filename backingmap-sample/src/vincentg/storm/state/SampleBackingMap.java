@@ -73,7 +73,7 @@ public class SampleBackingMap implements IBackingMap<OpaqueValue> {
 				while ( results.next() ) {
 					List<Object> vals = new ArrayList<>();
 					vals.add(results.getLong("txid"));
-					vals.add(results.getInt("prev_val"));
+					vals.add(results.getInt("prev"));
 					vals.add(results.getInt("val"));
 					kvMap.put(results.getString("id"), vals);
 				}
@@ -121,7 +121,7 @@ public class SampleBackingMap implements IBackingMap<OpaqueValue> {
 				System.out.println("[U] I: "
 						+"id="+key.get(0).toString()
 						+", txid="+values.get(vcntr).getCurrTxid() 
-						+", prev_val="+values.get(vcntr).getPrev()
+						+", prev="+values.get(vcntr).getPrev()
 						+", val="+values.get(vcntr).getCurr());
 				vcntr++;
 			}
@@ -147,10 +147,10 @@ public class SampleBackingMap implements IBackingMap<OpaqueValue> {
 		}
 		
 		
-		String update = "INSERT INTO sample_table (id,txid,prev_val,val) "
+		String update = "INSERT INTO sample_table (id,txid,prev,val) "
 				+"VALUES "+values
 				+" ON DUPLICATE KEY UPDATE "
-				+"txid=VALUES(txid),prev_val=VALUES(prev_val),val=VALUES(val)";
+				+"txid=VALUES(txid),prev=VALUES(prev),val=VALUES(val)";
 		
 		try {
 			ps = conn.prepareStatement(update);
@@ -168,7 +168,7 @@ public class SampleBackingMap implements IBackingMap<OpaqueValue> {
 		PreparedStatement ps = null;
 		
 		
-		String query = "SELECT id,txid,prev_val,val "
+		String query = "SELECT id,txid,prev,val "
 				+ "FROM sample_table "
 				+ "WHERE"+formatValues(sz);
 		try {
