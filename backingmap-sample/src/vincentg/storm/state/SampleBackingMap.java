@@ -16,12 +16,14 @@ import storm.trident.state.StateFactory;
 import storm.trident.state.map.CachedMap;
 import storm.trident.state.map.IBackingMap;
 import storm.trident.state.map.OpaqueMap;
+import storm.trident.tuple.TridentTuple;
 
 @SuppressWarnings("rawtypes")
 public class SampleBackingMap implements IBackingMap<OpaqueValue> {
 	
 	private Connection conn;
 	
+	//initialize connection to DB
 	public SampleBackingMap() {
 		try {
 			Class.forName("com.mysql.jdbc.Driver");
@@ -44,7 +46,11 @@ public class SampleBackingMap implements IBackingMap<OpaqueValue> {
 		
 		System.out.println("keys.size = "+keys.size());
 		
-		if ( !keys.isEmpty() ) {
+		if ( keys.isEmpty() ) {
+			System.out.println("retrieving keys from caches");
+		} else {
+			
+			System.out.println("retrieving keys from DB");
 			
 			PreparedStatement ps = makeQuery(keys.size());
 			
@@ -56,7 +62,8 @@ public class SampleBackingMap implements IBackingMap<OpaqueValue> {
 				//batch: get all ids
 				int cntr1=0;
 				for (List<Object> key : keys) {
-						ids.add(key.get(0).toString());
+//						ids.add(key.get(0).toString());
+						ids.add( ((TridentTuple)key).getValueByField("id").toString() ); //trident tuple!
 						ps.setObject(++cntr1, key.get(0));
 				}
 				
@@ -125,10 +132,6 @@ public class SampleBackingMap implements IBackingMap<OpaqueValue> {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		
-		
-		
-		
 	}
 	
 	
